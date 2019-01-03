@@ -1,21 +1,30 @@
-
-# This is the file where you must work.
-# Write code in the functions (and create new functions) so that they work
-# according to the specification.
-
+inventory = {'rope': 1, 'torch': 6, 'gold coin': 42, 'dagger': 1, 'arrow': 12}
+dragon_loot = ['gold coin', 'dagger', 'gold coin', 'gold coin', 'ruby']
 
 def display_inventory(inventory):
-    '''Display the inventory.'''
-    pass
+    """Display the inventory."""
+    total_quantity = 0
+    for item, quantity in inventory.items():
+        print("{} {}".format(quantity, item))
+        total_quantity += quantity
+    return "Total number of items: {}" .format(total_quantity)
 
 
 def add_to_inventory(inventory, added_items):
-    '''Add to the inventory dictionary a list of items from added_items.'''
-    pass
+    """Add to the inventory dictionary a list of items from added_items."""
+
+    new_loot = dict((item, added_items.count(item)) for item in set(added_items))
+    for item in new_loot:
+        if item in inventory:
+            inventory[item] += new_loot[item]
+        else:
+            inventory[item] = new_loot[item]
+    return display_inventory(inventory)
+
 
 
 def print_table(inventory, order=None):
-    '''
+    """
     Take your inventory and display it in a well-organized table with
     each column right-justified.
 
@@ -24,9 +33,39 @@ def print_table(inventory, order=None):
     - "count,desc" means the table is ordered by count (of items in the
       inventory) in descending order
     - "count,asc" means the table is ordered by count in ascending order
-    '''
+    """
+    longest_str_keys = ([len(str(x)) for x in inventory.keys()])
+    longest_str_values = ([len(str(x)) for x in inventory.keys()])
+    longest_string = max(longest_str_keys + longest_str_values)
 
-    pass
+
+    print("Inventory:")
+    print("{:>{ls}}  {:>{ls}}".format("count", "item name", ls=longest_string))
+    print("-" * (longest_string * 2 + 2))  # + 2 due to space between lower list
+    total_quantity = 0
+
+    if order == "empty":
+        for item, quantity in inventory.items():
+            print("{:>{ls}}  {:>{ls}}" .format(quantity, item, ls=longest_string))
+            total_quantity += int(quantity)
+        print("-" * (longest_string * 2 + 2))
+        return "Total number of items: {}" .format(total_quantity)
+
+    elif order == "count,desc":
+        inventory = dict(sorted(inventory.items(), key=lambda x: x[1], reverse=True))
+        for item, quantity in inventory.items():
+            print("{:>{ls}}  {:>{ls}}" .format(quantity, item, ls=longest_string))
+            total_quantity += int(quantity)
+        print("-" * (longest_string * 2 + 2))
+        return "Total number of items: {}" .format(total_quantity)
+
+    elif order == "count,asc":
+        inventory = dict(sorted(inventory.items(), key=lambda x: x[1], reverse=False))
+        for item, quantity in inventory.items():
+            print("{:>{ls}}  {:>{ls}}" .format(quantity, item, ls=longest_string))
+            total_quantity += int(quantity)
+        print("-" * (longest_string * 2 + 2))
+        return "Total number of items: {}" .format(total_quantity)
 
 
 def import_inventory(inventory, filename="import_inventory.csv"):
@@ -53,3 +92,6 @@ def export_inventory(inventory, filename="export_inventory.csv"):
     '''
 
     pass
+
+print(add_to_inventory(inventory, dragon_loot))
+print(print_table(inventory, order="count,asc"))
