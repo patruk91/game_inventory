@@ -1,13 +1,11 @@
-inventory = {'rope': 1, 'torch': 6, 'gold coin': 42, 'dagger': 1, 'arrow': 12}
-dragon_loot = ['gold coin', 'dagger', 'gold coin', 'gold coin', 'ruby']
-
+import csv
 def display_inventory(inventory):
     """Display the inventory."""
     total_quantity = 0
     for item, quantity in inventory.items():
         print("{} {}".format(quantity, item))
         total_quantity += quantity
-    return "Total number of items: {}" .format(total_quantity)
+    print("Total number of items: {}" .format(total_quantity))
 
 
 def add_to_inventory(inventory, added_items):
@@ -19,7 +17,7 @@ def add_to_inventory(inventory, added_items):
             inventory[item] += new_loot[item]
         else:
             inventory[item] = new_loot[item]
-    return display_inventory(inventory)
+    return inventory
 
 
 
@@ -49,7 +47,7 @@ def print_table(inventory, order=None):
             print("{:>{ls}}  {:>{ls}}" .format(quantity, item, ls=longest_string))
             total_quantity += int(quantity)
         print("-" * (longest_string * 2 + 2))
-        return "Total number of items: {}" .format(total_quantity)
+        print("Total number of items: {}" .format(total_quantity))
 
     elif order == "count,desc":
         inventory = dict(sorted(inventory.items(), key=lambda x: x[1], reverse=True))
@@ -57,7 +55,7 @@ def print_table(inventory, order=None):
             print("{:>{ls}}  {:>{ls}}" .format(quantity, item, ls=longest_string))
             total_quantity += int(quantity)
         print("-" * (longest_string * 2 + 2))
-        return "Total number of items: {}" .format(total_quantity)
+        print("Total number of items: {}" .format(total_quantity))
 
     elif order == "count,asc":
         inventory = dict(sorted(inventory.items(), key=lambda x: x[1], reverse=False))
@@ -65,33 +63,48 @@ def print_table(inventory, order=None):
             print("{:>{ls}}  {:>{ls}}" .format(quantity, item, ls=longest_string))
             total_quantity += int(quantity)
         print("-" * (longest_string * 2 + 2))
-        return "Total number of items: {}" .format(total_quantity)
+        print("Total number of items: {}" .format(total_quantity))
 
 
 def import_inventory(inventory, filename="import_inventory.csv"):
-    '''
+    """
     Import new inventory items from a file.
 
     The filename comes as an argument, but by default it's
     "import_inventory.csv". The import automatically merges items by name.
 
     The file format is plain text with comma separated values (CSV).
-    '''
-
-    pass
+    """
+    with open(filename) as file_object:
+        loot_list = []
+        for item in file_object:
+            loot_list = item.rstrip().split(",")
+        print(loot_list)
+        add_to_inventory(inventory, loot_list)
+        print_table(inventory, order="count,desc")
+    return inventory
 
 
 def export_inventory(inventory, filename="export_inventory.csv"):
-    '''
+    """
     Export the inventory into a .csv file.
 
     If the filename argument is None, it creates and overwrites a file
     called "export_inventory.csv".
 
     The file format is plain text with comma separated values (CSV).
-    '''
+    """
+    with open(filename, 'w') as file_object:
+        results = []
+        for k, v in inventory.items():
+            unpack_list = [k] * v
+            results.extend(unpack_list)
+        print(results)
 
-    pass
+        write_to_column = csv.writer(file_object)
+        write_to_column.writerow(results)
+        # for item in results:
+        #     file_object.write("{}," .format(item))
+        #     # file_object.write("%s," % item)
 
-print(add_to_inventory(inventory, dragon_loot))
-print(print_table(inventory, order="count,asc"))
+
