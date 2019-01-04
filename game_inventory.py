@@ -1,4 +1,6 @@
 import csv
+
+
 def display_inventory(inventory):
     """Display the inventory."""
     total_quantity = 0
@@ -10,8 +12,8 @@ def display_inventory(inventory):
 
 def add_to_inventory(inventory, added_items):
     """Add to the inventory dictionary a list of items from added_items."""
-
-    new_loot = dict((item, added_items.count(item)) for item in set(added_items))
+    new_loot = dict((item, added_items.count(item))
+                    for item in set(added_items))
     for item in new_loot:
         if item in inventory:
             inventory[item] += new_loot[item]
@@ -20,50 +22,88 @@ def add_to_inventory(inventory, added_items):
     return inventory
 
 
-
 def print_table(inventory, order=None):
     """
     Take your inventory and display it in a well-organized table with
     each column right-justified.
-
-    The 'order' parameter (string) works as follows:
-    - None (by default) means the table is unordered
-    - "count,desc" means the table is ordered by count (of items in the
-      inventory) in descending order
-    - "count,asc" means the table is ordered by count in ascending order
     """
     longest_str_keys = ([len(str(x)) for x in inventory.keys()])
     longest_str_values = ([len(str(x)) for x in inventory.keys()])
     longest_string = max(longest_str_keys + longest_str_values)
 
-
     print("Inventory:")
     print("{:>{ls}}  {:>{ls}}".format("count", "item name", ls=longest_string))
-    print("-" * (longest_string * 2 + 2))  # + 2 due to space between lower list
+    # + 2 due to space between lower list
+    print("-" * (longest_string * 2 + 2))
     total_quantity = 0
 
     if order == "empty":
-        for item, quantity in inventory.items():
-            print("{:>{ls}}  {:>{ls}}" .format(quantity, item, ls=longest_string))
-            total_quantity += int(quantity)
-        print("-" * (longest_string * 2 + 2))
-        print("Total number of items: {}" .format(total_quantity))
+        order_is_unordered(inventory, longest_string, total_quantity)
 
     elif order == "count,desc":
-        inventory = dict(sorted(inventory.items(), key=lambda x: x[1], reverse=True))
-        for item, quantity in inventory.items():
-            print("{:>{ls}}  {:>{ls}}" .format(quantity, item, ls=longest_string))
-            total_quantity += int(quantity)
-        print("-" * (longest_string * 2 + 2))
-        print("Total number of items: {}" .format(total_quantity))
+        order_is_descending(inventory, longest_string, total_quantity)
 
     elif order == "count,asc":
-        inventory = dict(sorted(inventory.items(), key=lambda x: x[1], reverse=False))
-        for item, quantity in inventory.items():
-            print("{:>{ls}}  {:>{ls}}" .format(quantity, item, ls=longest_string))
-            total_quantity += int(quantity)
-        print("-" * (longest_string * 2 + 2))
-        print("Total number of items: {}" .format(total_quantity))
+        order_is_ascending(inventory, longest_string, total_quantity)
+
+
+def order_is_unordered(inventory, longest_string, total_quantity):
+    """
+    The 'order' parameter (string) works as follows:
+    None (by default) means the table is unordered
+    """
+    for item, quantity in inventory.items():
+        print(
+            "{:>{ls}}  {:>{ls}}".format(
+                quantity,
+                item,
+                ls=longest_string))
+        total_quantity += int(quantity)
+    print("-" * (longest_string * 2 + 2))
+    print("Total number of items: {}".format(total_quantity))
+
+
+def order_is_descending(inventory, longest_string, total_quantity):
+    """
+    The 'order' parameter (string) works as follows:
+    "count,desc" means the table is ordered by count (of items in the
+    inventory) in descending order
+    """
+    inventory = dict(
+        sorted(
+            inventory.items(),
+            key=lambda x: x[1],
+            reverse=True))
+    for item, quantity in inventory.items():
+        print(
+            "{:>{ls}}  {:>{ls}}".format(
+                quantity,
+                item,
+                ls=longest_string))
+        total_quantity += int(quantity)
+    print("-" * (longest_string * 2 + 2))
+    print("Total number of items: {}".format(total_quantity))
+
+
+def order_is_ascending(inventory, longest_string, total_quantity):
+    """
+    The 'order' parameter (string) works as follows:
+    "count,asc" means the table is ordered by count in ascending order
+    """
+    inventory = dict(
+        sorted(
+            inventory.items(),
+            key=lambda x: x[1],
+            reverse=False))
+    for item, quantity in inventory.items():
+        print(
+            "{:>{ls}}  {:>{ls}}".format(
+                quantity,
+                item,
+                ls=longest_string))
+        total_quantity += int(quantity)
+    print("-" * (longest_string * 2 + 2))
+    print("Total number of items: {}".format(total_quantity))
 
 
 def import_inventory(inventory, filename="import_inventory.csv"):
@@ -103,8 +143,3 @@ def export_inventory(inventory, filename="export_inventory.csv"):
 
         write_to_column = csv.writer(file_object)
         write_to_column.writerow(results)
-        # for item in results:
-        #     file_object.write("{}," .format(item))
-        #     # file_object.write("%s," % item)
-
-
